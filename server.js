@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { User, Property } = require('./schemas');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const authenticateToken=require('./authenticateToken');
 
 const app = express();
 const port = 5000;
@@ -64,14 +65,14 @@ app.post("/login", async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user._id }, "yourSecret", { expiresIn: '1h' }); // Change 'yourSecret' to your secret key
+        const token = jwt.sign({ userId: user._id, role:user.role }, "yourSecret", { expiresIn: '1h' }); // Change 'yourSecret' to your secret key
     
-        console.log(await user.role);
+        console.log(user.role);
         res.send({
             message: "User logged in successfully",
             token: token,
-            role: await user.role,
-            id: await user._id.toString()
+            role: user.role,
+            id: user._id.toString()
         });
     } catch (error) {
         console.error('Error occurred during login:', error);
@@ -151,6 +152,63 @@ app.get('/getUser/:id', async (req, res) => {
     }
 });
 
+
+app.post('/addProperty/:id', async (req, res) => {   //id is of user
+    try {
+        const {
+            place,
+            area,
+            bedrooms,
+            bathrooms,
+            hospitals,
+            colleges,
+            parking,
+            propertyType,
+            description,
+            price,
+            yearBuilt,
+            totalFloors,
+            amenities,
+            furnishedStatus
+        } = req.body;
+
+        // Get seller ID from authenticated user (you might need to modify this based on your authentication setup)
+        const sellerId = req.params.id; 
+
+        // Create new property
+        const newProperty = new Property({
+            place,
+            area,
+            bedrooms,
+            bathrooms,
+            hospitals,
+            colleges,
+            parking,
+            propertyType,
+            description,
+            price,
+            yearBuilt,
+            totalFloors,
+            amenities,
+            furnishedStatus,
+            seller: sellerId
+        });
+
+        // Save property to database
+        await newProperty.save();
+
+        // Update seller's properties array
+        await User.findByIdAndUpdate(sellerId, {
+            $push: { properties: newProperty._id }
+        });
+
+        res.status(201).json({ message: 'Property added successfully', property: newProperty });
+    } catch (error) {
+        console.error('Error adding property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.delete('/deleteProperty/:id', async (req, res) => {
     try {
         const property = await Property.findById(req.params.id);
@@ -189,17 +247,50 @@ app.put('/updateProperty/:id', async (req, res) => {
     }
 });
 
-app.post('/likeProperty/:id', async (req, res) => {
+app.post('/likeProperty/:id', authenticateToken, async (req, res) => {
     try {
-        const property = await Property.findById(req.params.id);
+        const userId = req.user.userId; // Now you can access userId from req.user
+        const propertyId = req.params.id;
+
+        const property = await Property.findById(propertyId);
+        const user = await User.findById(userId);
+
         if (!property) {
             return res.status(404).send('Property not found');
         }
-        property.likes += 1;
-        await property.save();
-        res.send(property);
+
+        const isLiked = user.likedProperties.includes(propertyId);
+
+        if (isLiked) {
+            user.likedProperties.pull(propertyId); // Remove the property ID from likedProperties
+            property.likes -= 1; // Decrement the likes count
+        } else {
+            user.likedProperties.push(propertyId); // Add the property ID to likedProperties
+            property.likes += 1; // Increment the likes count
+        }
+
+        await user.save(); // Save the user document
+        await property.save(); // Save the property document
+
+        res.json({ likes: property.likes, liked: !isLiked });
     } catch (error) {
         console.error('Error occurred while liking property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+app.get('/isPropertyLiked/:propertyId', authenticateToken, async (req, res) => {
+    try {
+        const propertyId = req.params.propertyId;
+        const userId = req.user.userId;
+
+        const user = await User.findById(userId);
+        const isLiked = user.likedProperties.includes(propertyId);
+
+        res.json({ liked: isLiked });
+    } catch (error) {
+        console.error('Error occurred while checking liked property:', error);
         res.status(500).send('Internal Server Error');
     }
 });

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Updated User Schema
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -15,33 +14,21 @@ const userSchema = new mongoose.Schema({
     properties: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Property'
+    }],
+    likedProperties: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Property'
     }]
 });
 
-// Updated Property Schema
-const PropertySchema = new mongoose.Schema({
-    place: {
-        type: String,
-        required: true
-    },
-    area: {
-        type: Number,
-        required: true
-    },
-    bedrooms: {
-        type: Number,
-        required: true
-    },
-    bathrooms: {
-        type: Number,
-        required: true
-    },
-    hospitals: {
-        type: String
-    },
-    colleges: {
-        type: String
-    },
+
+const propertySchema = new mongoose.Schema({
+    place: { type: String, required: true },
+    area: { type: Number, required: true },
+    bedrooms: { type: Number, required: true },
+    bathrooms: { type: Number, required: true },
+    hospitals: { type: String },
+    colleges: { type: String },
     parking: {
         type: String,
         enum: ['Yes', 'No'],
@@ -52,19 +39,10 @@ const PropertySchema = new mongoose.Schema({
         enum: ['Apartment', 'House', 'Villa'],
         required: true
     },
-    description: {
-        type: String
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    yearBuilt: {
-        type: Number
-    },
-    totalFloors: {
-        type: Number
-    },
+    description: { type: String },
+    price: { type: Number, required: true },
+    yearBuilt: { type: Number },
+    totalFloors: { type: Number },
     amenities: {
         type: [String],
         enum: ['Gym', 'Pool', 'Playground']
@@ -82,13 +60,11 @@ const PropertySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    likes: {
-        type: Number,
-        default: 0
-    }
+    likes: { type: Number, default: 0 }
 });
 
-const Property = mongoose.model('Property', PropertySchema);
+
+const Property = mongoose.model('Property', propertySchema);
 const User = mongoose.model('User', userSchema);
 
 module.exports = { User, Property };
