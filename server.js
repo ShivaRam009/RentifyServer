@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { User, Property } = require('./schemas');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const authenticateToken=require('./authenticateToken');
+
 
 const app = express();
 const port = 5000;
@@ -247,7 +247,7 @@ app.put('/updateProperty/:id', async (req, res) => {
     }
 });
 
-app.post('/likeProperty/:id', authenticateToken, async (req, res) => {
+app.post('/likeProperty/:id', async (req, res) => {
     try {
         const userId = req.user.userId; // Now you can access userId from req.user
         const propertyId = req.params.id;
@@ -280,7 +280,7 @@ app.post('/likeProperty/:id', authenticateToken, async (req, res) => {
 });
 
 
-app.get('/isPropertyLiked/:propertyId', authenticateToken, async (req, res) => {
+app.get('/isPropertyLiked/:propertyId', async (req, res) => {
     try {
         const propertyId = req.params.propertyId;
         const userId = req.user.userId;
