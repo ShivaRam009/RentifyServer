@@ -14,7 +14,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const mongoUrl = 'mongodb+srv://shivarammittakola:LubPSfYqTtSEsnrb@helpdeskfb.wkwxabo.mongodb.net/test';
-//const mongoUrl = 'mongodb+srv://gsnagc5022:UpcJyLq7L00p5h4t@cluster0.scdenlt.mongodb.net/test';
+
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB Atlas'))
