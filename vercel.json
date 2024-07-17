@@ -1,10 +1,10 @@
 {
-    "version": 2,
-    "name": "Rentify",
-    "builds": [
-       { "src": "server.js", "use": "@vercel/node" }
-    ],
-    "routes": [
-       { "src": "/(.*)", "dest": "./server.js" }
-    ]
- }
+   "version": 2,
+   "name": "Rentify",
+   "builds": [
+      { "src": "index.js", "use": "@vercel/node" }
+   ],
+   "routes": [
+      { "src": "/(.*)", "dest": "/index.js" }
+   ]
+}

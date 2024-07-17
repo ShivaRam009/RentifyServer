@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const { User, Property } = require('./schemas');
+const { User, Property } = require('./schema');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -294,6 +294,10 @@ app.get('/isPropertyLiked/:propertyId', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.get('/',(req, res)=>{
+    res.send("Welcome to Rentify");
+  });
 
 
 app.listen(port, () => {
