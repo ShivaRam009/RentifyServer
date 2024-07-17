@@ -20,9 +20,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB Atlas'))
     .catch(err => console.error('Failed to connect to MongoDB Atlas', err));
 
-app.get('/', (req, res) => {
-    res.send('Hello World! Database connection successful.');
-});
+
 
 app.post('/register', async (req, res) => {
     try {
